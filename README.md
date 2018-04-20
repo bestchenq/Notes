@@ -16,3 +16,6 @@ https://www.jianshu.com/p/6d2f324c8f42
 
 Java 虚拟机.md
 https://github.com/CyC2018/Interview-Notebook/blob/master/notes/Java%20%E8%99%9A%E6%8B%9F%E6%9C%BA.md
+
+数字签名和数字证书
+https://github.com/Tencent/VasDolly/wiki/VasDolly%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86
