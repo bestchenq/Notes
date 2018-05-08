@@ -29,4 +29,7 @@ https://www.jianshu.com/p/b336b5bb666a
   
 tag是对历史一个提交id的引用，如果理解这句话就明白了
 使用git checkout tag即可切换到指定tag，例如：git checkout v0.1.0
-切换到tag历史记录会处在分离头指针状态，这个是的修改是很危险的，在切换回主线时如果没有合并，之前的修改提交基本都会丢失，如果需要修改可以尝试git checkout -b branch tag创建一个基于指定tag的分支，例如：git checkout -b tset v0.1.0  这个时候就会在分支上进行开发，之后可以切换到主线合并
+切换到tag历史记录会处在分离头指针状态，这个是的修改是很危险的，在切换回主线时如果没有合并，之前的修改提交基本都会丢失，如果需要修改可以尝试git checkout -b branch tag创建一个基于指定tag的分支，例如：git checkout -b tset v0.1.0  这个时候就会在分支上进行开发，之后可以切换到主线合并  
+
+Android - Activity 启动过程  
+https://github.com/jeanboydev/Android-ReadTheFuckingSourceCode/blob/master/android/Android-Activity%E5%90%AF%E5%8A%A8%E8%BF%87%E7%A8%8B.md
