@@ -74,5 +74,16 @@ https://yq.aliyun.com/articles/184116
 "title": "greet_command",  指令标题  固定值greet_command
 "timestamp": 1527493694140, 当前时间戳
 "greet_scheme": 1,   迎宾方案，和机器人本地的迎宾方案相对应，默认为1，表示设置迎宾方案为方案一。
-"msg": 是一个数组列表，当只识别到一个人的时候就对应机器人的单人迎宾，当有多个人的时候就对应机器人的多人迎宾。
+"msg": 是一个数组列表，当只识别到一个人的时候就对应机器人的单人迎宾，当有多个人的时候就对应机器人的多人迎宾。  
+
+
+artifactory_url=http://10.10.22.41:18083/artifactory
+artifactory_username=outsourcing
+artifactory_password=outsourcing1234
+# Artifactory cruzr team repositories
+artifactory_cruzr_release=cruzr-release-local
+artifactory_cruzr_snapshot=cruzr-snapshot-local
+artifactory_virtual_release=libs-release
+artifactory_virtual_snapshot=libs-snapshot
+
 
