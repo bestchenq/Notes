@@ -50,4 +50,29 @@ https://www.jianshu.com/p/fb815eaf628f
 通过Executors的newSingleThreadExecutor()方法来创建，它内部只有一个核心线程，它确保所有任务进来都要排队按顺序执行。它的意义在于，统一所有的外界任务到同一线程中，让调用者可以忽略线程同步问题。   
 
 LeakCanary内存检测原理   
-https://yq.aliyun.com/articles/184116
+https://yq.aliyun.com/articles/184116  
+
+
+
+机器人迎宾websocket接口协议：
+{
+    "title": "greet_command",
+    "timestamp": 1527493694140,
+    "greet_scheme": 1,
+    "msg": [
+        {
+            "greet_words": "xxx局长好！"
+        },
+        {
+            "greet_words": "xxx主任好"
+        }
+    ]
+}
+
+
+协议说明：
+"title": "greet_command",  指令标题  固定值greet_command
+"timestamp": 1527493694140, 当前时间戳
+"greet_scheme": 1,   迎宾方案，和机器人本地的迎宾方案相对应，默认为1，表示设置迎宾方案为方案一。
+"msg": 是一个数组列表，当只识别到一个人的时候就对应机器人的单人迎宾，当有多个人的时候就对应机器人的多人迎宾。
+
