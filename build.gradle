@@ -1,0 +1,147 @@
+apply plugin: 'com.android.application'
+
+def isSnapShot = true
+def coreServiceSDKVersion = "0.1.7"
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion '25.0.2'
+
+    defaultConfig {
+        applicationId "com.ubtechinc.cruzr.user"
+        minSdkVersion 21
+        targetSdkVersion 25
+        versionCode 3
+        versionName "1.3.1.1"
+
+        /******************************** 编译信息 **********************************/
+        //编译分支
+        buildConfigField "String", "BRANCH", "\"${getGitBranchName()}\""
+        //编译时间
+        buildConfigField "String", "BUILD_TIME", "\"${currentSystemTime()}\""
+        //编译产品线
+        buildConfigField "String", "BUILD_PRODUCT", "\"${getJenkinsBuildProduct()}\""
+        //编译代码提交
+        buildConfigField "String", "BUILD_COMIIT", "\"${getGitCommit()}\""
+
+        /******************************** 常量定义 **********************************/
+        //SDK应用ID
+        buildConfigField "int", "CRUZR_APP_ID", "5"
+        //主版本产品ID，集成迎宾指令，接收空闲广播
+        buildConfigField "int", "PRODUCT_ID_CORE", "0"
+        //居然之家产品ID，自定义的迎宾语料，屏蔽空闲广播，移除迎宾指令
+        buildConfigField "int", "PRODUCT_ID_EASYHOME", "1"
+        //通用产品ID，屏蔽唤醒广播，移除迎宾指令
+        buildConfigField "int", "PRODUCT_ID_COMMON", "2"
+
+        /******************************** 默认配置 **********************************/
+        //Bugly版本
+        manifestPlaceholders = [BUGLY_APP_VERSION: "Core_V${versionName}" ]
+        //默认主版本
+        buildConfigField "int", "PRODUCT_ID", "0"
+        //迎宾默认动作
+        buildConfigField "String", "DEFAULT_GREET_ACTION", "\"random\""
+        //迎宾默认表情
+        buildConfigField "String", "DEFAULT_GREET_DISPLAY", "\"face://face_speak\""
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file('cruzr.keystore')
+            storePassword 'UBT_Cruzr_2017'
+            keyAlias 'cruzrandoridkey'
+            keyPassword 'UBT_Cruzr_2017'
+        }
+        release {
+            storeFile file('cruzr.keystore')
+            storePassword 'UBT_Cruzr_2017'
+            keyAlias 'cruzrandoridkey'
+            keyPassword 'UBT_Cruzr_2017'
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            applicationVariants.all { variant ->
+                variant.outputs.each { output ->
+                    def outputFile = output.outputFile
+                    def fileName = "UserMgr_${variant.flavorName}_${buildType.name}_v${defaultConfig.versionName}.apk"
+                    output.outputFile = new File(outputFile.parent, fileName)
+                }
+            }
+        }
+    }
+
+    android {
+        lintOptions {
+            checkReleaseBuilds false
+            abortOnError false
+        }
+    }
+
+    productFlavors {
+        Core {}
+        BYD {}
+        CIQ {}
+        DIY {}
+        KMG {
+            buildConfigField "int", "PRODUCT_ID", "2"
+        }
+        NSPolice {}
+        Tasly {}
+        EasyHome {
+            buildConfigField "int", "PRODUCT_ID", "1"
+            buildConfigField "String", "DEFAULT_GREET_ACTION", "\"\""
+            buildConfigField "String", "DEFAULT_GREET_DISPLAY", "\"face://face_happy\""
+        }
+        EasyHomeShop {
+            buildConfigField "int", "PRODUCT_ID", "2"
+        }
+
+        productFlavors.all {
+            flavor -> flavor.manifestPlaceholders = [BUGLY_APP_VERSION: "${name}_v${defaultConfig.versionName}" ]
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 1, 'minutes'
+}
+
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile project(':cropview')
+    compile project(':recognition2')
+    compile project(':recognitionx')
+    compile project(':downloadmanager')
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:recyclerview-v7:25.3.1'
+    compile 'org.greenrobot:eventbus:3.0.0'
+    compile 'de.hdodenhof:circleimageview:2.2.0'
+    compile 'com.github.bumptech.glide:glide:3.7.0'
+    compile 'com.yanzhenjie:recyclerview-swipe:1.0.4'
+    compile 'com.github.promeg:tinypinyin:2.0.3' // TinyPinyin核心包，约80KB
+    compile 'com.jakewharton:butterknife:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+    compile ('io.socket:socket.io-client:0.8.3') {
+        // excluding org.json which is provided by Android
+        exclude group: 'org.json', module: 'json'
+    }
+    //compile 'com.tencent.bugly:crashreport:latest.release'
+    if (isSnapShot) {
+        compile(group: 'com.ubtechnic.cruzr', name: 'cruzr-sdk', version: "${coreServiceSDKVersion}-SNAPSHOT", changing: true)
+    } else {
+        compile(group: 'com.ubtechnic.cruzr', name: 'cruzr-sdk', version: "${coreServiceSDKVersion}")
+    }
+    compile 'com.google.code.gson:gson:2.6.2'
+
+
+}
