@@ -77,7 +77,10 @@ https://yq.aliyun.com/articles/184116
 "msg": 是一个数组列表，当只识别到一个人的时候就对应机器人的单人迎宾，当有多个人的时候就对应机器人的多人迎宾。  
 
 Android性能优化来龙去脉总结
-https://cloud.tencent.com/developer/article/1145224  
+https://cloud.tencent.com/developer/article/1145224     
+
+https://linux.linuxidc.com/index.php  
+linux 公社资源库
 
 
 
