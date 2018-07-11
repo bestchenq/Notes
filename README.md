@@ -80,7 +80,10 @@ Android性能优化来龙去脉总结
 https://cloud.tencent.com/developer/article/1145224     
 
 https://linux.linuxidc.com/index.php  
-linux 公社资源库
+linux 公社资源库  
+
+https://www.jianshu.com/p/37c263f9886b  
+TraceView的详细使用
 
 
 
