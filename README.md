@@ -86,7 +86,11 @@ https://www.jianshu.com/p/37c263f9886b
 TraceView的详细使用   
 
 关于ClassLoader相关知识  
-https://blog.csdn.net/briblue/article/details/54973413
+https://blog.csdn.net/briblue/article/details/54973413   
+
+
+https://blog.csdn.net/sybnfkn040601/article/details/73194613   
+HashMap的长度为什么设置为2的n次方
 
 
 
