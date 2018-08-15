@@ -90,7 +90,10 @@ https://blog.csdn.net/briblue/article/details/54973413
 
 
 https://blog.csdn.net/sybnfkn040601/article/details/73194613   
-HashMap的长度为什么设置为2的n次方
+HashMap的长度为什么设置为2的n次方  
+
+https://mp.weixin.qq.com/s?__biz=MzI1MzYzMjE0MQ==&mid=2247484502&idx=2&sn=a60ea223de4171dd2022bc2c71e09351&scene=21#wechat_redirect  
+一种极低成本的Android屏幕适配方式
 
 
 
