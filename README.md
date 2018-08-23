@@ -101,7 +101,11 @@ https://mp.weixin.qq.com/s?__biz=MzI1MzYzMjE0MQ==&mid=2247484502&idx=2&sn=a60ea2
     
     
   Java并发编程：volatile关键字解析  
-  http://www.cnblogs.com/dolphin0520/p/3920373.html
+  http://www.cnblogs.com/dolphin0520/p/3920373.html   
+  
+  
+  Java 多线程与并发编程专题   
+  https://www.ibm.com/developerworks/cn/java/j-concurrent/#JAVAZ%E7%BA%BF16
 
 
 
