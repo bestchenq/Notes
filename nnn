@@ -1,0 +1,26 @@
+1、Retrofit + Okhttp + RxJava网络请求，单例RetrofitClient。
+   异步处理网络请求，并且方便在主线程更新UI(RxJava)，
+
+2、原始录音文件过大，不利于网络传输。NDK 编译Lame源码，用来压缩MP3音频大小。源码需要稍作修改来适配Android系统，已经修改好的可以直接来用的地址：
+   https://github.com/bestchenq/LameForAndroid
+
+3、监听和设置状态机
+   监听状态SystemStatusApi.get().init(this, new StatusInitCallBack(){}，需要打断录音就发送一个广播。
+   SystemStatusApi.get().setAppStatus; 设置状态机。
+ 
+4、创建上传Service（WorkService）在后台上传，并且在数据库中记录上传文件是否完成，避免了退出APP后没有继续上传和传输不完整的问题。
+   
+5、百度的ASR识别率高于讯飞的。项目组可以切换ASR。
+   AsrControllerManager来管理两种Asr
+   在各自的AsrController里面来通过handler发送识别的结果，StartRecordFragment里面接收处理刷新UI。
+   
+   
+可优化点：
+1、布局建议用ConstraintLayout，减少嵌套层级。
+
+2、后台拍照保存图片可以压缩，可以借鉴一些开源图片压缩库。
+
+3、UploadHelper#uploadBigFile(File file, String RequestURL) 里面用的HttpURLConnection上传大文件
+   ，项目里面已经有Rertrofit上传文件的接口，可以直接复用（上传大文件OOM的问题已经解决好了，和开启了OkHttp打印请求BODY有关）。
+
+4、HistoryRecordFragment#createImageView(List<ImageInfo> list) 会一次性把LinearLayout包裹的所有的ImageView图片加载出来，可以考虑用RecyclerView，只展示眼前可见的。
