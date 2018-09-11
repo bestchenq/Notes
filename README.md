@@ -105,7 +105,10 @@ https://mp.weixin.qq.com/s?__biz=MzI1MzYzMjE0MQ==&mid=2247484502&idx=2&sn=a60ea2
   
   
   Java 多线程与并发编程专题   
-  https://www.ibm.com/developerworks/cn/java/j-concurrent/#JAVAZ%E7%BA%BF16
+  https://www.ibm.com/developerworks/cn/java/j-concurrent/#JAVAZ%E7%BA%BF16   
+     
+  https://www.cnblogs.com/renhui/p/7452572.html   
+  Android 音视频开发学习思路
 
 
 
