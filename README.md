@@ -111,7 +111,11 @@ https://mp.weixin.qq.com/s?__biz=MzI1MzYzMjE0MQ==&mid=2247484502&idx=2&sn=a60ea2
   Android 音视频开发学习思路   
   
   https://www.jianshu.com/p/9f3e879a4c9c   
-  一篇文章带你熟悉 TCP/IP 协议
+  一篇文章带你熟悉 TCP/IP 协议    
+  
+  
+  https://www.jianshu.com/u/511ba5d71aef   
+  简书
 
 
 
