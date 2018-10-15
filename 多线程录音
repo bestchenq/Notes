@@ -1,0 +1,239 @@
+
+
+
+
+Android录音框架以及多线程录音实现
+
+
+
+Revision HISTORY
+修订记录
+Date
+日期	Version
+版本	Name
+姓名	Comments
+备注
+2017.11.17	V1.0	潘宇超	拟定初稿
+2018.01.19	V2.0	潘宇超	多线程录音之管道实现中的Down/UpMixing、重采样操作在新版本已经实现
+
+
+
+2018.03.05	V3.0	潘宇超	增加录音框架以及多线程录音关键点
+
+
+
+
+
+
+
+
+目录
+
+一、摘要
+二、Android录音框架
+三、多个录音软件同时工作的四个方案
+1、增加新的pcm录音口链路
+2、Socket
+3、Pipe管道
+4、单线程多Track录音
+四、“Pipe管道”多线程录音的具体实现方法
+五、附录
+
+
+一、摘要
+Android目前支持多线程或者单线程多Track播放，但是针对录音，仅支持单线程多Track录音，而且还有限制（Android默认禁止了此功能）
+
+	本文档介绍首先介绍Android的录音框架，然后阐述多个录音软件同时工作的四个方案，以及“Pipe管道”方案的具体实现方法
+
+二、Android录音框架
+ 
+
+Android平台录音功能框图
+
+
+1、App使用录音流程的伪代码
+
+
+
+
+
+
+
+
+
+2、创建录音线程时主要完成了下面的工作
+（1）决定这次录音从哪个输入设备采集数据
+AudioPolicyManager::getDeviceForInputSource(audio_source_t inputSource)
+
+（2）创建录音线程，保存硬件真正录制的格式
+AudioFlinger::openInput_l()
+\___inHwHal->open_input_stream() //判断硬件是否支持应用请求的格式
+\___new RecordThread()//创建录音线程
+\___RecordThread::readInputParameters_l() //保存硬件真正录制的格式
+
+（3）创建共享内存，存放采集的pcm数据
+Class TrackBase的构造方法中：
+mCblkMemory= client->heap()->allocate(size);//创建一块共享内存
+mCblk = static_cast<audio_track_cblk_t *>(mCblkMemory->pointer());
+new(mCblk) audio_track_cblk_t();//构造audio_track_cblk_t对象协调生产和消费者
+
+共享内存如下图：
+---------------------------------------------------------------------
+| audio_track_cblk_t mCblk | mBuffer of FIFO（size）|
+---------------------------------------------------------------------
+
+（4）保存应用请求录制的格式
+class TrackBase构造方法的参数列表中
+
+下面是new AudioRecord() & AudioRecord()::set()的时序图，源文件《Android录音框架.eap》，使用Enterprise Architect打开：
+ 
+
+下面是AudioSystem::getInputForAttr()的时序图：
+ 
+
+
+3、为什么会发生重采样、down/up-mixing？在哪里进行这些操作？
+重采样：不同采样率间的转换
+Down/up-mixing：不用采样位数、通道数间的转换
+
+应用请求的录音格式，如果与硬件支持的录音格式不一致，AudioFlinger能够将从硬件采集的数据，通过相应的转换后，再传输给应用
+
+因此，前面提到，将硬件真正录制和应用请求的格式分别保存在AudioFlinger::RecordThread和AudioFlinger::RecordThread::RecordTrack中。在启动录音后（audioRecord.startRecording()），首先从硬件中读取数据，然后对比硬件真正录制和应用请求的格式，如果不同则需要进行相应转换操作：
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+与多线程录音实现相关的模块已经红色标出：AudioPolicyManager、AudioFlinger、Audio HAL、ALSA/Asoc Core和Kernel Asoc Driver
+三、多个录音软件同时工作的四个方案
+1、增加新的pcm录音口链路
+一个硬件平台默认仅提供一个pcm录音口链路，供AudioRecord使用。可以修改Audio HAL、ALSA/Asoc Core和Kernel Asoc Driver模块，当第二个录音软件打开时，使用一个新的pcm录音口链路
+
+2、Socket
+将第一个录音软件的pcm数据，通过LocalSocket直接拷贝到第二个录音软件中。该功能可以在Audio HAL或者AudioFlinger中实现，下面以AudioFlinger为例说明：
+（1）AudioFlinger服务启动时，创建Local Socket服务端
+（2）第一个录音软件启动，默认使用Android标准的AudioRecod；第二个录音软件启动后，如果发现系统已经有录音线程启动，第二个录音软件会创建Local Socket客户端，并连接服务端
+（3）AudioFlinger::RecordThread线程从Audio HAL拿到从MIC传过来的PCM后，通过Socket传送到第二个录音软件
+（4）如果第一个录音软件停止录音后，通知第二个录音软件，后者会使用AudioRecod API创建录音，保证音频数据不会断开
+
+3、Pipe管道
+将第一个录音软件的pcm数据，先保存到管道Pipe中，第二个录音软件的数据直接从Pipe中获取。该功能可以在Audio HAL或者AudioFlinger中实现，下面以AudioFlinger为例说明：
+（1）启动第一个录音软件，AudioFlinger::RecordThread线程从Audio HAL拿到从MIC传过来的PCM后，保存到一个Pipe中
+（2）AudioFlinger::RecordThread发现已经有录音线程启动后，会从Pipe中拷贝数据到第二个应用在AudioFlinger对应track buffer中
+
+4、单线程多Track录音
+如《摘要》所述，Android原生（AudioFlinger）是支持单线程多Track录音，即多个录音软件同时工作。但是在AudioFlinger的前后AudioPolicyManager和Audio HAL模块中，禁止了此功能
+
+关于禁用的原因，个人猜测至少有一点：
+	隐私/安全
+试想如果有一后台服务创建AudioRecod，收集用户的语音数据。就算打开其他的录音软件，用户也得不到提醒。就像camera预览时，必须一个前台SurfaceView
+
+四个方案对比：
+	兼容性	修改模块
+增加新的pcm录音口链路	中。N个录音软件，则需要N个pcm录音口链路，硬件上，pcm录音口链路的数量是有限制的	Audio HAL、ALSA/Asoc Core和Kernel Asoc Driver
+Socket	低。应用需要增加Local Socket的操作	AudioPolicyManager、AudioFlinger和录音软件
+或者Audio HAL、AudioPolicyManager、和录音软件
+
+Pipe管道	高	AudioPolicyManager、AudioFlinger
+或者Audio HAL、AudioPolicyManager
+单线程多Track录音	高。多个录音软件仅使用Android标准的录音API，而且不用考虑每个录音软件的录制格式（采样率、采样位数、通道数），这部分的工作AudioFlinger已经做好了	AudioPolicyManage、Audio HAL
+
+四、“Pipe管道”多线程录音的具体实现方法
+核心的实现在录音线程的执行体中，伪代码如下：
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1、该功能实现关键点
+（1）去除android官方对多线程录音的限制
+audioRecord.startRecording() ->AudioPolicyManager::startInput(…)
+
+（2）第一个线程停止后，第二个线程要自动从audio hal拿数据
+第一个线程停止后，第二个线程会读不到数据。因此，可以这样设计：当第二个线程读取不到数据超过一定次数，则重置它的读取机制，改为使用Android标准，从Audio HAL拿到从MIC传过来的PCM。伪代码如下：
+
+
+
+
+
+
+
+
+
+
+
+（3）三个线程同时录音支持（读取buffer位置需要保护）
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+（4）重采样、down/up-mixing处理（如果两个应用的录制格式不一样该如何处理）
+
+
+
+
+
+
+
+
+
+
+
+
+
+2、AudioFlinger RecordThread Tee 管道功能
+下面的Tee功能的类图&时序图，源文件见《AudioFlinger RecordThread Tee管道功能_类图&时序图.eddx》（使用亿图软件打开）：
+ 
+
+
+五、附录
+1、点击Android原生“设置”->“提示音和通知”->“通知音量”，无法播放声音（mediaserver died）
+Cruzr上有两个声卡，分别是card0和card3：
+ 
+
+card0只能用来录音（pcmC0D0c），crad3可以录音和播放（pcmC3D0c、pcmC3D0p）：
+ 
+ 
+
+声卡0没有播放的pcm通道（pcmC0D0p），因此，Cruzr上播放使用的是usb声卡的播放pcm通道（pcmC3D0p）
+但是，在播放选择的是AUDIO_DEVICE_OUT_SPEAKER | AUDIO_DEVICE_OUT_USB_DEVICE。正式播放时，会open(“/dev/snd/pcmC0D0p”)，但是该节点并不存在，出现了空指针的Fault
+ 
