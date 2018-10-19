@@ -122,7 +122,11 @@ https://mp.weixin.qq.com/s?__biz=MzI1MzYzMjE0MQ==&mid=2247484502&idx=2&sn=a60ea2
   算法相关   
   
   https://mp.weixin.qq.com/s/H1Nm3upXT-f-jyf2rpT7XQ  
-  校招面试题
+  校招面试题   
+  
+  
+  https://github.com/Tencent/VasDolly/wiki/VasDolly%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86  
+  Android V1和V2签名机制。
   
 
 
